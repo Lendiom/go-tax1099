@@ -23,7 +23,7 @@ func (t *tax1099Impl) Authorize(email, password, appKey string) error {
 	log.Println("Authorizing...")
 
 	var res loginResponse
-	if err := t.post("/login", loginRequest{Email: email, Password: password, AppKey: appKey}, &res); err != nil {
+	if err := t.post(t.generateFullUrl(UrlMain, "/login"), loginRequest{Email: email, Password: password, AppKey: appKey}, &res); err != nil {
 		return err
 	}
 
