@@ -29,7 +29,7 @@ func (t *tax1099Impl) Submit1098s(payload Submit1098sRequest) (Submit1098sRespon
 	log.Println("Submitting the 1098 forms...")
 
 	var res Submit1098sResponse
-	if err := t.post(t.generateFullUrl(UrlPayment, "/payment/forms/import/submit/1098"), payload, &res); err != nil {
+	if err := t.post(t.generateFullUrl(UrlPayment, "payment/forms/import/submit/1098"), payload, &res); err != nil {
 		return res, err
 	}
 

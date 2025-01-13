@@ -13,6 +13,7 @@ type UrlType string
 var (
 	UrlMain    UrlType = "main"
 	UrlPayment UrlType = "payment"
+	Url1098    UrlType = "1098"
 )
 
 // TinType defines the allowed values for the TinType field

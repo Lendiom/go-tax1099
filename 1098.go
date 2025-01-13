@@ -55,7 +55,7 @@ func (t *tax1099Impl) Validate1098(payload Submit1098Request) (Submit1098Respons
 	log.Println("Submitting the 1098 form for validation...")
 
 	var res Submit1098Response
-	if err := t.post(t.generateFullUrl(UrlMain, "/form/1098/validate"), payload, &res); err != nil {
+	if err := t.post(t.generateFullUrl(Url1098, "form/1098/validate"), payload, &res); err != nil {
 		return res, err
 	}
 

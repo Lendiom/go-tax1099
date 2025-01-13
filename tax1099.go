@@ -7,6 +7,7 @@ import (
 	"io"
 	"log"
 	"net/http"
+	"strings"
 	"time"
 )
 
@@ -47,17 +48,31 @@ func (t *tax1099Impl) generateFullUrl(urlType UrlType, endpoint string) string {
 
 	switch urlType {
 	case UrlMain:
-		baseUrl = "https://tax1099api.1099cloud.com"
+		baseUrl = "https://tax1099api.1099cloud.com/api/v1"
+
+		if t.env == EnvironmentProduction {
+			baseUrl = "https://app.tax1099.com/api/v1"
+		}
+	case Url1098:
+		baseUrl = "https://apiform1098.1099cloud.com/api/v1"
+
+		if t.env == EnvironmentProduction {
+			baseUrl = "https://form1098.tax1099.com/api/v1"
+		}
 	case UrlPayment:
 		baseUrl = "https://apipayment.1099cloud.com/api/v1"
+
+		if t.env == EnvironmentProduction {
+			baseUrl = "https://apipayment.tax1099.com/api/v1"
+		}
 	}
 
 	return fmt.Sprintf("%s/%s", baseUrl, endpoint)
 }
 
 func (t *tax1099Impl) post(url string, payload, returnValue interface{}) error {
-	// Re-authorize if the token has expired
-	if time.Now().After(t.tokenExpiresAt) {
+	// Re-authorize if the token has expired, but only if the URL is not the login URL
+	if time.Now().After(t.tokenExpiresAt) && !strings.Contains(url, "/login") {
 		if err := t.Authorize(t.username, t.password, t.appKey); err != nil {
 			return fmt.Errorf("failed to re-authorize: %v", err)
 		}

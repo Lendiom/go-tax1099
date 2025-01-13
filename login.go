@@ -9,7 +9,7 @@ import (
 var ErrBadLogin = errors.New("bad login")
 
 type loginRequest struct {
-	Email    string `json:"email"`
+	Email    string `json:"login"`
 	Password string `json:"password"`
 	AppKey   string `json:"appKey"`
 }
@@ -23,7 +23,7 @@ func (t *tax1099Impl) Authorize(email, password, appKey string) error {
 	log.Println("Authorizing...")
 
 	var res loginResponse
-	if err := t.post(t.generateFullUrl(UrlMain, "/login"), loginRequest{Email: email, Password: password, AppKey: appKey}, &res); err != nil {
+	if err := t.post(t.generateFullUrl(UrlMain, "login"), loginRequest{Email: email, Password: password, AppKey: appKey}, &res); err != nil {
 		return err
 	}
 
