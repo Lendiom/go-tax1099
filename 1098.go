@@ -63,3 +63,16 @@ func (t *tax1099Impl) Validate1098(payload Submit1098Request) (Submit1098Respons
 
 	return res, nil
 }
+
+func (t *tax1099Impl) Import1098(payload Submit1098Request) (Submit1098Response, error) {
+	log.Println("Submitting the 1098 form for import...")
+
+	var res Submit1098Response
+	if err := t.post(t.generateFullUrl(Url1098, "form/importonly/1098"), payload, &res); err != nil {
+		return res, err
+	}
+
+	log.Printf("Import response: %+v", res)
+
+	return res, nil
+}

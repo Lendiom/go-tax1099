@@ -14,6 +14,7 @@ import (
 type Tax1099 interface {
 	Authorize(email, password, appKey string) error
 	Validate1098(payload Submit1098Request) (Submit1098Response, error)
+	Import1098(payload Submit1098Request) (Submit1098Response, error)
 	Submit1098s(payload Submit1098sRequest) (Submit1098sResponse, error)
 }
 
