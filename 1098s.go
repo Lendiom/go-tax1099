@@ -16,6 +16,7 @@ type Submit1098sRequest struct {
 }
 
 type Submit1098sResponse struct {
+	TraceIdentifier        string `json:"traceIdentifier,omitempty"`
 	Message                string `json:"message,omitempty"`
 	StatusCode             int    `json:"statusCode,omitempty"`
 	OriginalStatusCode     int    `json:"originalStatusCode,omitempty"`

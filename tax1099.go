@@ -78,13 +78,15 @@ func (t *tax1099Impl) post(url string, payload, returnValue interface{}) error {
 		}
 	}
 
-	log.Printf("Tax1099 POST %s: %+v", url, payload)
+	log.Printf("Tax1099 POST %s", url)
 
 	body, err := json.Marshal(payload)
 	if err != nil {
 		log.Printf("Failed to marshal the payload: %+v", payload)
 		return err
 	}
+
+	log.Printf("Payload: %s", body)
 
 	req, err := http.NewRequest("POST", url, bytes.NewReader(body))
 	if err != nil {

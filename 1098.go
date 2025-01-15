@@ -27,7 +27,7 @@ type Form1098 struct {
 	MortgageDate        string        `json:"mortgageDate"`       //Mortgage Date is the date the mortgage was originated
 	IsAddressSame       bool          `json:"isAddressSame"`      //Is Address Same is used to indicate if the property address is the same as the recipient address
 	PropertyAddress     string        `json:"propertyAddress"`    //Property Address is the address of the property for which the form is being filed
-	PropertyDescription string        `json:"propertyDescription"`
+	PropertyDescription string        `json:"propertyDescription,omitempty"`
 	USPSMail            bool          `json:"uspsMail"`        //USPS Mail is used to indicate if the form should be mailed to the payer
 	TINCheck            bool          `json:"tinCheck"`        //TIN Check is used to indicate if the TIN should be checked
 	EDelivery           bool          `json:"eDelivery"`       //E-Delivery is used to indicate if the form should be delivered electronically
