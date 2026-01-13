@@ -1,7 +1,8 @@
 package tax1099
 
 import (
-	"log"
+	"context"
+	"log/slog"
 	"time"
 )
 
@@ -26,15 +27,15 @@ type Submit1098sResponse struct {
 	TotalCount             int    `json:"totalCount,omitempty"`
 }
 
-func (t *tax1099Impl) Submit1098s(payload Submit1098sRequest) (Submit1098sResponse, error) {
-	log.Println("Submitting the 1098 forms...")
+func (t *tax1099Impl) Submit1098s(ctx context.Context, payload Submit1098sRequest) (Submit1098sResponse, error) {
+	slog.InfoContext(ctx, "Submitting the 1098 forms...")
 
 	var res Submit1098sResponse
-	if err := t.post(t.generateFullUrl(UrlPayment, "payment/forms/import/submit/1098"), payload, &res); err != nil {
+	if err := t.post(ctx, t.generateFullUrl(UrlPayment, "payment/forms/import/submit/1098"), payload, &res); err != nil {
 		return res, err
 	}
 
-	log.Printf("...1098 forms submitted: %+v", res)
+	slog.InfoContext(ctx, "...1098 forms submitted", "response", res)
 
 	return res, nil
 }
