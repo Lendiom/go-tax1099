@@ -1,6 +1,9 @@
 package tax1099
 
-import "log"
+import (
+	"context"
+	"log/slog"
+)
 
 // Submit1098Request represents the JSON structure for submitting 1098 forms
 type Submit1098Request struct {
@@ -51,28 +54,28 @@ type SubmissionResult struct {
 	IsInserted bool `json:"isInserted"`
 }
 
-func (t *tax1099Impl) Validate1098(payload Submit1098Request) (Submit1098Response, error) {
-	log.Println("Submitting the 1098 form for validation...")
+func (t *tax1099Impl) Validate1098(ctx context.Context, payload Submit1098Request) (Submit1098Response, error) {
+	slog.InfoContext(ctx, "Submitting the 1098 form for validation...")
 
 	var res Submit1098Response
-	if err := t.post(t.generateFullUrl(Url1098, "form/1098/validate"), payload, &res); err != nil {
+	if err := t.post(ctx, t.generateFullUrl(Url1098, "form/1098/validate"), payload, &res); err != nil {
 		return res, err
 	}
 
-	log.Printf("Validation response: %+v", res)
+	slog.InfoContext(ctx, "Validation response", "response", res)
 
 	return res, nil
 }
 
-func (t *tax1099Impl) Import1098(payload Submit1098Request) (Submit1098Response, error) {
-	log.Println("Submitting the 1098 form for import...")
+func (t *tax1099Impl) Import1098(ctx context.Context, payload Submit1098Request) (Submit1098Response, error) {
+	slog.InfoContext(ctx, "Submitting the 1098 form for import...")
 
 	var res Submit1098Response
-	if err := t.post(t.generateFullUrl(Url1098, "form/importonly/1098"), payload, &res); err != nil {
+	if err := t.post(ctx, t.generateFullUrl(Url1098, "form/importonly/1098"), payload, &res); err != nil {
 		return res, err
 	}
 
-	log.Printf("Import response: %+v", res)
+	slog.InfoContext(ctx, "Import response", "response", res)
 
 	return res, nil
 }
