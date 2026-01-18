@@ -14,19 +14,19 @@ const (
 )
 
 type DownloadFormRequest struct {
-	FormID              uint       `json:"formId"`
+	FormID              uint       `json:"formId,omitempty"`
 	FormType            string     `json:"formType"`
-	Status              FormStatus `json:"status"`
-	ClientPayerID       string     `json:"clientPayerId"`
-	PayerTin            string     `json:"payerTin"`
-	TaxYear             string     `json:"taxYear"`
-	DisregardedEntity   string     `json:"disregardedEntity"`
-	CardReferenceID     string     `json:"cardReferenceId"`
-	IsAllCopies         bool       `json:"isAllCopies"`
-	IsPayerCopyOnly     bool       `json:"isPayerCopyOnly"`
-	IsRecipientCopyOnly bool       `json:"isRecipientCopyOnly"`
-	IsStateCopyOnly     bool       `json:"isStateCopyOnly"`
-	UnMaskPDF           bool       `json:"unMaskPDF"`
+	Status              FormStatus `json:"status,omitempty"`
+	ClientPayerID       string     `json:"clientPayerId,omitempty"`
+	PayerTin            string     `json:"payerTin,omitempty"`
+	TaxYear             string     `json:"taxYear,omitempty"`
+	DisregardedEntity   string     `json:"disregardedEntity,omitempty"`
+	CardReferenceID     string     `json:"cardReferenceId,omitempty"`
+	IsAllCopies         bool       `json:"isAllCopies,omitempty"`
+	IsPayerCopyOnly     bool       `json:"isPayerCopyOnly,omitempty"`
+	IsRecipientCopyOnly bool       `json:"isRecipientCopyOnly,omitempty"`
+	IsStateCopyOnly     bool       `json:"isStateCopyOnly,omitempty"`
+	UnMaskPDF           bool       `json:"unMaskPDF,omitempty"`
 }
 
 // DownloadFilledForm downloads a filled 1099 form PDF based on the provided criteria.
