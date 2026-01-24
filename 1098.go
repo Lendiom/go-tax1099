@@ -58,7 +58,7 @@ func (t *tax1099Impl) Validate1098(ctx context.Context, payload Submit1098Reques
 	slog.InfoContext(ctx, "Submitting the 1098 form for validation...")
 
 	var res Submit1098Response
-	if err := t.post(ctx, t.generateFullUrl(Url1098, "form/1098/validate"), payload, &res); err != nil {
+	if err := t.post(ctx, t.generateFullUrl(Url1098, "forms/1098/validate"), payload, &res); err != nil {
 		return res, err
 	}
 
@@ -71,7 +71,7 @@ func (t *tax1099Impl) Import1098(ctx context.Context, payload Submit1098Request)
 	slog.InfoContext(ctx, "Submitting the 1098 form for import...")
 
 	var res Submit1098Response
-	if err := t.post(ctx, t.generateFullUrl(Url1098, "form/importonly/1098"), payload, &res); err != nil {
+	if err := t.post(ctx, t.generateFullUrl(Url1098, "forms/importonly/1098"), payload, &res); err != nil {
 		return res, err
 	}
 
