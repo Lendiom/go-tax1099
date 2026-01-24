@@ -33,7 +33,7 @@ type tax1099Impl struct {
 
 func New(ctx context.Context, env Environment, username, password, appKey string) (Tax1099, error) {
 	c := &http.Client{}
-	c.Timeout = 60 * time.Second
+	c.Timeout = 90 * time.Second
 
 	tximpl := &tax1099Impl{
 		env:      env,
@@ -57,7 +57,7 @@ func (t *tax1099Impl) generateFullUrl(urlType UrlType, endpoint string) string {
 			baseUrl = "https://app.tax1099.com/api/v1"
 		}
 	case Url1098:
-		baseUrl = "https://apiform1098.1099cloud.com/api/v1"
+		baseUrl = "https://apiforms.1099cloud.com/api/v1"
 
 		if t.env == EnvironmentProduction {
 			baseUrl = "https://form1098.tax1099.com/api/v1"
