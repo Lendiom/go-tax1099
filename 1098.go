@@ -57,8 +57,13 @@ type SubmissionResult struct {
 func (t *tax1099Impl) Validate1098(ctx context.Context, payload Submit1098Request) (Submit1098Response, error) {
 	slog.InfoContext(ctx, "Submitting the 1098 form for validation...")
 
+	urlPart := "forms/1098/validate"
+	if t.isProduction() {
+		urlPart = "form/1098/validate"
+	}
+
 	var res Submit1098Response
-	if err := t.post(ctx, t.generateFullUrl(Url1098, "forms/1098/validate"), payload, &res); err != nil {
+	if err := t.post(ctx, t.generateFullUrl(Url1098, urlPart), payload, &res); err != nil {
 		return res, err
 	}
 
@@ -70,8 +75,13 @@ func (t *tax1099Impl) Validate1098(ctx context.Context, payload Submit1098Reques
 func (t *tax1099Impl) Import1098(ctx context.Context, payload Submit1098Request) (Submit1098Response, error) {
 	slog.InfoContext(ctx, "Submitting the 1098 form for import...")
 
+	urlPart := "forms/importonly/1098"
+	if t.isProduction() {
+		urlPart = "form/importonly/1098"
+	}
+
 	var res Submit1098Response
-	if err := t.post(ctx, t.generateFullUrl(Url1098, "forms/importonly/1098"), payload, &res); err != nil {
+	if err := t.post(ctx, t.generateFullUrl(Url1098, urlPart), payload, &res); err != nil {
 		return res, err
 	}
 

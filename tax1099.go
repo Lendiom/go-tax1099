@@ -46,6 +46,10 @@ func New(ctx context.Context, env Environment, username, password, appKey string
 	return tximpl, tximpl.Authorize(ctx, username, password, appKey)
 }
 
+func (t *tax1099Impl) isProduction() bool {
+	return t.env == EnvironmentProduction
+}
+
 func (t *tax1099Impl) generateFullUrl(urlType UrlType, endpoint string) string {
 	var baseUrl string
 
@@ -53,19 +57,19 @@ func (t *tax1099Impl) generateFullUrl(urlType UrlType, endpoint string) string {
 	case UrlMain:
 		baseUrl = "https://tax1099api.1099cloud.com/api/v1"
 
-		if t.env == EnvironmentProduction {
+		if t.isProduction() {
 			baseUrl = "https://app.tax1099.com/api/v1"
 		}
 	case Url1098:
 		baseUrl = "https://apiforms.1099cloud.com/api/v1"
 
-		if t.env == EnvironmentProduction {
+		if t.isProduction() {
 			baseUrl = "https://form1098.tax1099.com/api/v1"
 		}
 	case UrlPayment:
 		baseUrl = "https://apipayment.1099cloud.com/api/v1"
 
-		if t.env == EnvironmentProduction {
+		if t.isProduction() {
 			baseUrl = "https://apipayment.tax1099.com/api/v1"
 		}
 	}
