@@ -31,9 +31,9 @@ type tax1099Impl struct {
 	client *http.Client
 }
 
-func New(ctx context.Context, env Environment, username, password, appKey string) (Tax1099, error) {
+func New(ctx context.Context, env Environment, username, password, appKey string, timeout time.Duration) (Tax1099, error) {
 	c := &http.Client{}
-	c.Timeout = 90 * time.Second
+	c.Timeout = timeout
 
 	tximpl := &tax1099Impl{
 		env:      env,
