@@ -21,10 +21,15 @@ type loginResponse struct {
 }
 
 func (t *tax1099Impl) Authorize(ctx context.Context, email, password, appKey string) error {
-	slog.InfoContext(ctx, "Authorizing...")
+	const op = "tax1099.authorize"
+
+	slog.InfoContext(ctx, "Authorizing...",
+		slog.String("component", component),
+		slog.String("op", op),
+	)
 
 	var res loginResponse
-	if err := t.post(ctx, t.generateFullUrl(UrlMain, "login"), loginRequest{Email: email, Password: password, AppKey: appKey}, &res); err != nil {
+	if err := t.post(ctx, op, t.generateFullUrl(UrlMain, "login"), loginRequest{Email: email, Password: password, AppKey: appKey}, &res); err != nil {
 		return err
 	}
 
@@ -35,7 +40,10 @@ func (t *tax1099Impl) Authorize(ctx context.Context, email, password, appKey str
 	t.token = res.SessionID
 	t.tokenExpiresAt = time.Now().Add(55 * time.Minute) // 5 minutes before the token expires
 
-	slog.InfoContext(ctx, "...authorization complete")
+	slog.InfoContext(ctx, "...authorization complete",
+		slog.String("component", component),
+		slog.String("op", op),
+	)
 
 	return nil
 }

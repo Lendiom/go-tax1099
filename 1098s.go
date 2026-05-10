@@ -28,14 +28,23 @@ type Submit1098sResponse struct {
 }
 
 func (t *tax1099Impl) Submit1098s(ctx context.Context, payload Submit1098sRequest) (Submit1098sResponse, error) {
-	slog.InfoContext(ctx, "Submitting the 1098 forms...")
+	const op = "tax1099.submit_1098s"
+
+	slog.InfoContext(ctx, "Submitting the 1098 forms...",
+		slog.String("component", component),
+		slog.String("op", op),
+	)
 
 	var res Submit1098sResponse
-	if err := t.post(ctx, t.generateFullUrl(UrlPayment, "payment/forms/import/submit/1098"), payload, &res); err != nil {
+	if err := t.post(ctx, op, t.generateFullUrl(UrlPayment, "payment/forms/import/submit/1098"), payload, &res); err != nil {
 		return res, err
 	}
 
-	slog.InfoContext(ctx, "...1098 forms submitted", "response", res)
+	slog.InfoContext(ctx, "...1098 forms submitted",
+		slog.String("component", component),
+		slog.String("op", op),
+		slog.Any("response", res),
+	)
 
 	return res, nil
 }

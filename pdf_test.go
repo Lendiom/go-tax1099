@@ -395,7 +395,7 @@ func Test_tax1099Impl_DownloadFilledForm_ValidInputs(t *testing.T) {
 
 			// We need to temporarily modify the method to use the test server URL
 			// For this, we'll call postForBytes directly with the test URL
-			data, gotErr := ta.postForBytes(context.Background(), testURL, tt.payload)
+			data, gotErr := ta.postForBytes(context.Background(), "tax1099.download_filled_form", testURL, tt.payload)
 
 			if gotErr != nil {
 				t.Fatalf("DownloadFilledForm() error = %v, want nil", gotErr)

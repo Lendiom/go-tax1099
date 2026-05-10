@@ -32,6 +32,8 @@ type DownloadFormRequest struct {
 // DownloadFilledForm downloads a filled 1099 form PDF based on the provided criteria.
 // Either FormID or the combination of PayerTin and TaxYear must be provided.
 func (t *tax1099Impl) DownloadFilledForm(ctx context.Context, payload DownloadFormRequest) ([]byte, error) {
+	const op = "tax1099.download_filled_form"
+
 	if payload.FormID > 0 {
 		if payload.PayerTin != "" || payload.TaxYear != "" {
 			return nil, fmt.Errorf("formId cannot be combined with payerTin or taxYear")
@@ -48,14 +50,20 @@ func (t *tax1099Impl) DownloadFilledForm(ctx context.Context, payload DownloadFo
 		return nil, fmt.Errorf("status must be %q or %q", FormStatusNotSubmitted, FormStatusSubmitted)
 	}
 
-	slog.InfoContext(ctx, "Downloading filled form PDF...")
+	slog.InfoContext(ctx, "Downloading filled form PDF...",
+		slog.String("component", component),
+		slog.String("op", op),
+	)
 
-	data, err := t.postForBytes(ctx, t.generateFullUrl(UrlMain, "pdf/forms/getpdfs"), payload)
+	data, err := t.postForBytes(ctx, op, t.generateFullUrl(UrlMain, "pdf/forms/getpdfs"), payload)
 	if err != nil {
 		return nil, err
 	}
 
-	slog.InfoContext(ctx, "...filled form PDF downloaded")
+	slog.InfoContext(ctx, "...filled form PDF downloaded",
+		slog.String("component", component),
+		slog.String("op", op),
+	)
 
 	return data, nil
 }

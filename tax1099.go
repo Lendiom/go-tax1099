@@ -12,6 +12,8 @@ import (
 	"time"
 )
 
+const component = "go-tax1099"
+
 type Tax1099 interface {
 	Authorize(ctx context.Context, email, password, appKey string) error
 	Validate1098(ctx context.Context, payload Submit1098Request) (Submit1098Response, error)
@@ -77,7 +79,7 @@ func (t *tax1099Impl) generateFullUrl(urlType UrlType, endpoint string) string {
 	return fmt.Sprintf("%s/%s", baseUrl, endpoint)
 }
 
-func (t *tax1099Impl) post(ctx context.Context, url string, payload, returnValue interface{}) error {
+func (t *tax1099Impl) post(ctx context.Context, op, url string, payload, returnValue interface{}) error {
 	// Re-authorize if the token has expired, but only if the URL is not the login URL
 	if time.Now().After(t.tokenExpiresAt) && !strings.Contains(url, "/login") {
 		if err := t.Authorize(ctx, t.username, t.password, t.appKey); err != nil {
@@ -85,19 +87,40 @@ func (t *tax1099Impl) post(ctx context.Context, url string, payload, returnValue
 		}
 	}
 
-	slog.InfoContext(ctx, "Tax1099 POST", "url", url)
+	slog.InfoContext(ctx, "Tax1099 POST",
+		slog.String("component", component),
+		slog.String("op", op),
+		slog.String("url", url),
+	)
 
 	body, err := json.Marshal(payload)
 	if err != nil {
-		slog.ErrorContext(ctx, "Failed to marshal payload", "payload", payload, "error", err)
+		slog.ErrorContext(ctx, "Failed to marshal payload",
+			slog.String("component", component),
+			slog.String("op", op),
+			slog.Any("payload", payload),
+			slog.Any("error", err),
+		)
 		return err
 	}
 
-	slog.InfoContext(ctx, "Payload", "body", string(body))
+	// Payload bodies for tax forms include TINs, recipient names, addresses,
+	// and dollar amounts. Keep the verbatim body at debug-only so production
+	// INFO output stays free of PII; consumers that need the raw payload can
+	// turn the package's slog level up to debug for a single call.
+	slog.DebugContext(ctx, "Payload",
+		slog.String("component", component),
+		slog.String("op", op),
+		slog.String("body", string(body)),
+	)
 
 	req, err := http.NewRequestWithContext(ctx, "POST", url, bytes.NewReader(body))
 	if err != nil {
-		slog.ErrorContext(ctx, "Failed to create request", "error", err)
+		slog.ErrorContext(ctx, "Failed to create request",
+			slog.String("component", component),
+			slog.String("op", op),
+			slog.Any("error", err),
+		)
 		return err
 	}
 
@@ -110,18 +133,33 @@ func (t *tax1099Impl) post(ctx context.Context, url string, payload, returnValue
 
 	resp, err := http.DefaultClient.Do(req)
 	if err != nil {
-		slog.ErrorContext(ctx, "Failed to make request", "error", err)
+		slog.ErrorContext(ctx, "Failed to make request",
+			slog.String("component", component),
+			slog.String("op", op),
+			slog.Any("error", err),
+		)
 		return err
 	}
 	defer resp.Body.Close()
 
 	data, err := io.ReadAll(resp.Body)
 	if err != nil {
-		slog.ErrorContext(ctx, "Failed to read response body", "error", err)
+		slog.ErrorContext(ctx, "Failed to read response body",
+			slog.String("component", component),
+			slog.String("op", op),
+			slog.Any("error", err),
+		)
 		return err
 	}
 
 	if resp.StatusCode != http.StatusOK {
+		slog.ErrorContext(ctx, "tax1099 request returned non-200",
+			slog.String("component", component),
+			slog.String("op", op),
+			slog.String("url", url),
+			slog.Int("status_code", resp.StatusCode),
+			slog.String("body", string(data)),
+		)
 		return fmt.Errorf("status code %d return from %s with body: %s", resp.StatusCode, url, data)
 	}
 
@@ -132,7 +170,7 @@ func (t *tax1099Impl) post(ctx context.Context, url string, payload, returnValue
 	return json.Unmarshal(data, returnValue)
 }
 
-func (t *tax1099Impl) postForBytes(ctx context.Context, url string, payload interface{}) ([]byte, error) {
+func (t *tax1099Impl) postForBytes(ctx context.Context, op, url string, payload interface{}) ([]byte, error) {
 	// Re-authorize if the token has expired, but only if the URL is not the login URL
 	if time.Now().After(t.tokenExpiresAt) && !strings.Contains(url, "/login") {
 		if err := t.Authorize(ctx, t.username, t.password, t.appKey); err != nil {
@@ -140,19 +178,37 @@ func (t *tax1099Impl) postForBytes(ctx context.Context, url string, payload inte
 		}
 	}
 
-	slog.InfoContext(ctx, "Tax1099 POST", "url", url)
+	slog.InfoContext(ctx, "Tax1099 POST",
+		slog.String("component", component),
+		slog.String("op", op),
+		slog.String("url", url),
+	)
 
 	body, err := json.Marshal(payload)
 	if err != nil {
-		slog.ErrorContext(ctx, "Failed to marshal payload", "payload", payload, "error", err)
+		slog.ErrorContext(ctx, "Failed to marshal payload",
+			slog.String("component", component),
+			slog.String("op", op),
+			slog.Any("payload", payload),
+			slog.Any("error", err),
+		)
 		return nil, err
 	}
 
-	slog.InfoContext(ctx, "Payload", "body", string(body))
+	// See post() for why this is debug-only.
+	slog.DebugContext(ctx, "Payload",
+		slog.String("component", component),
+		slog.String("op", op),
+		slog.String("body", string(body)),
+	)
 
 	req, err := http.NewRequestWithContext(ctx, "POST", url, bytes.NewReader(body))
 	if err != nil {
-		slog.ErrorContext(ctx, "Failed to create request", "error", err)
+		slog.ErrorContext(ctx, "Failed to create request",
+			slog.String("component", component),
+			slog.String("op", op),
+			slog.Any("error", err),
+		)
 		return nil, err
 	}
 
@@ -165,18 +221,33 @@ func (t *tax1099Impl) postForBytes(ctx context.Context, url string, payload inte
 
 	resp, err := http.DefaultClient.Do(req)
 	if err != nil {
-		slog.ErrorContext(ctx, "Failed to make request", "error", err)
+		slog.ErrorContext(ctx, "Failed to make request",
+			slog.String("component", component),
+			slog.String("op", op),
+			slog.Any("error", err),
+		)
 		return nil, err
 	}
 	defer resp.Body.Close()
 
 	data, err := io.ReadAll(resp.Body)
 	if err != nil {
-		slog.ErrorContext(ctx, "Failed to read response body", "error", err)
+		slog.ErrorContext(ctx, "Failed to read response body",
+			slog.String("component", component),
+			slog.String("op", op),
+			slog.Any("error", err),
+		)
 		return nil, err
 	}
 
 	if resp.StatusCode != http.StatusOK {
+		slog.ErrorContext(ctx, "tax1099 request returned non-200",
+			slog.String("component", component),
+			slog.String("op", op),
+			slog.String("url", url),
+			slog.Int("status_code", resp.StatusCode),
+			slog.String("body", string(data)),
+		)
 		return nil, fmt.Errorf("status code %d return from %s with body: %s", resp.StatusCode, url, data)
 	}
 
