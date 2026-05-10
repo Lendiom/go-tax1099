@@ -55,7 +55,12 @@ type SubmissionResult struct {
 }
 
 func (t *tax1099Impl) Validate1098(ctx context.Context, payload Submit1098Request) (Submit1098Response, error) {
-	slog.InfoContext(ctx, "Submitting the 1098 form for validation...")
+	const op = "tax1099.validate_1098"
+
+	slog.InfoContext(ctx, "Submitting the 1098 form for validation...",
+		slog.String("component", component),
+		slog.String("op", op),
+	)
 
 	urlPart := "forms/1098/validate"
 	if t.isProduction() {
@@ -63,17 +68,26 @@ func (t *tax1099Impl) Validate1098(ctx context.Context, payload Submit1098Reques
 	}
 
 	var res Submit1098Response
-	if err := t.post(ctx, t.generateFullUrl(Url1098, urlPart), payload, &res); err != nil {
+	if err := t.post(ctx, op, t.generateFullUrl(Url1098, urlPart), payload, &res); err != nil {
 		return res, err
 	}
 
-	slog.InfoContext(ctx, "Validation response", "response", res)
+	slog.InfoContext(ctx, "Validation response",
+		slog.String("component", component),
+		slog.String("op", op),
+		slog.Any("response", res),
+	)
 
 	return res, nil
 }
 
 func (t *tax1099Impl) Import1098(ctx context.Context, payload Submit1098Request) (Submit1098Response, error) {
-	slog.InfoContext(ctx, "Submitting the 1098 form for import...")
+	const op = "tax1099.import_1098"
+
+	slog.InfoContext(ctx, "Submitting the 1098 form for import...",
+		slog.String("component", component),
+		slog.String("op", op),
+	)
 
 	urlPart := "forms/importonly/1098"
 	if t.isProduction() {
@@ -81,11 +95,15 @@ func (t *tax1099Impl) Import1098(ctx context.Context, payload Submit1098Request)
 	}
 
 	var res Submit1098Response
-	if err := t.post(ctx, t.generateFullUrl(Url1098, urlPart), payload, &res); err != nil {
+	if err := t.post(ctx, op, t.generateFullUrl(Url1098, urlPart), payload, &res); err != nil {
 		return res, err
 	}
 
-	slog.InfoContext(ctx, "Import response", "response", res)
+	slog.InfoContext(ctx, "Import response",
+		slog.String("component", component),
+		slog.String("op", op),
+		slog.Any("response", res),
+	)
 
 	return res, nil
 }
