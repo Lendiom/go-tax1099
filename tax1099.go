@@ -131,7 +131,7 @@ func (t *tax1099Impl) post(ctx context.Context, op, url string, payload, returnV
 	req.Header.Add("Accept", "application/json")
 	req.Header.Add("Authorization", fmt.Sprintf("Bearer %s", t.token))
 
-	resp, err := http.DefaultClient.Do(req)
+	resp, err := t.client.Do(req)
 	if err != nil {
 		slog.ErrorContext(ctx, "Failed to make request",
 			slog.String("component", component),
@@ -219,7 +219,7 @@ func (t *tax1099Impl) postForBytes(ctx context.Context, op, url string, payload 
 	req.Header.Add("Accept", "application/pdf")
 	req.Header.Add("Authorization", fmt.Sprintf("Bearer %s", t.token))
 
-	resp, err := http.DefaultClient.Do(req)
+	resp, err := t.client.Do(req)
 	if err != nil {
 		slog.ErrorContext(ctx, "Failed to make request",
 			slog.String("component", component),
