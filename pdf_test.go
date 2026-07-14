@@ -522,3 +522,63 @@ func Test_DownloadFormRequest_JSONMarshaling(t *testing.T) {
 		})
 	}
 }
+
+func Test_tax1099Impl_postForBytes_NonPDFResponse(t *testing.T) {
+	tests := []struct {
+		name             string
+		mockResponseBody []byte
+		wantErr          bool
+	}{
+		{
+			name:             "PDF response is returned",
+			mockResponseBody: []byte("%PDF-1.4 mock pdf content"),
+			wantErr:          false,
+		},
+		{
+			name:             "JSON error envelope with 200 status is rejected",
+			mockResponseBody: []byte(`{"statusCode":400,"message":"form not found"}`),
+			wantErr:          true,
+		},
+		{
+			name:             "empty body is rejected",
+			mockResponseBody: []byte(""),
+			wantErr:          true,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+				w.WriteHeader(http.StatusOK)
+				w.Write(tt.mockResponseBody)
+			}))
+			defer server.Close()
+
+			ta := &tax1099Impl{
+				env:            EnvironmentStaging,
+				token:          "test-token",
+				tokenExpiresAt: time.Now().Add(1 * time.Hour),
+				client:         server.Client(),
+			}
+
+			data, gotErr := ta.postForBytes(context.Background(), "tax1099.download_filled_form", server.URL+"/api/v1/pdf/forms/getpdfs", DownloadFormRequest{FormID: 123, FormType: "1098"})
+
+			if tt.wantErr {
+				if gotErr == nil {
+					t.Fatalf("postForBytes() error = nil, want non-PDF rejection")
+				}
+				if !strings.Contains(gotErr.Error(), "is not a PDF") {
+					t.Errorf("postForBytes() error = %v, want it to mention 'is not a PDF'", gotErr)
+				}
+				return
+			}
+
+			if gotErr != nil {
+				t.Fatalf("postForBytes() error = %v, want nil", gotErr)
+			}
+
+			if string(data) != string(tt.mockResponseBody) {
+				t.Errorf("Response body = %q, want %q", string(data), string(tt.mockResponseBody))
+			}
+		})
+	}
+}

@@ -251,5 +251,27 @@ func (t *tax1099Impl) postForBytes(ctx context.Context, op, url string, payload 
 		return nil, fmt.Errorf("status code %d return from %s with body: %s", resp.StatusCode, url, data)
 	}
 
+	// The provider can return a 200 with a JSON error envelope; without this check
+	// those bytes would be passed along as if they were the requested PDF.
+	if !bytes.HasPrefix(data, []byte("%PDF")) {
+		slog.ErrorContext(ctx, "tax1099 request returned a non-PDF body",
+			slog.String("component", component),
+			slog.String("op", op),
+			slog.String("url", url),
+			slog.String("body", truncateForError(data)),
+		)
+		return nil, fmt.Errorf("response from %s is not a PDF, body: %s", url, truncateForError(data))
+	}
+
 	return data, nil
+}
+
+// truncateForError limits a response body to a readable length for error messages.
+func truncateForError(data []byte) string {
+	const maxLen = 200
+	if len(data) <= maxLen {
+		return string(data)
+	}
+
+	return string(data[:maxLen]) + "..."
 }
